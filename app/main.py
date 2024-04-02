@@ -19,7 +19,7 @@ def check_photo(image: UploadFile):
         return Response(status_code=422)
 
     image_path = save_file(image, image.content_type)
-    task = create_task.delay(image_path)
+    task = create_task.delay(str(image_path))
     return JSONResponse({"task_id": task.id})
 
 
