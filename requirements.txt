@@ -42,3 +42,9 @@ tzdata==2024.1
 uvicorn==0.29.0
 vine==5.1.0
 wcwidth==0.2.13
+
+torch==2.2.2
+pandas==2.2.1
+albumentations==1.4.3
+datasouls-antispoof==0.0.4
+iglovikov-helper_functions==0.0.53

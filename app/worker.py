@@ -2,7 +2,7 @@ import os
 import time
 
 from celery import Celery
-from celery.utils.time import random
+from app.neural_network import get_prediction
 
 BROKER_URL = os.environ.get("CELERY_BROKER_URL", "redis://localhost:6379")
 RESULT_BACKEND = os.environ.get("CELERY_RESULT_BACKEND", "redis://localhost:6379")
@@ -19,9 +19,4 @@ def create_task(image_path: str):
 
 def predict(image: str) -> dict[str, float]:
     time.sleep(2)
-    return {
-        "param1": random.random(),
-        "param2": random.random(),
-        "param3": random.random(),
-        "param4": random.random(),
-    }
+    return get_prediction(image)
