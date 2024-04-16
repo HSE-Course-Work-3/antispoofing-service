@@ -1,11 +1,13 @@
 from pathlib import Path
 from uuid import UUID
+from datetime import datetime
 
 from celery.result import AsyncResult
 from fastapi import FastAPI, Response, UploadFile
 from fastapi.responses import JSONResponse
 
-from app.worker import create_task
+from app.worker import create_task, predict_image
+from app.neural_network import get_prediction
 
 app = FastAPI()
 
@@ -19,7 +21,7 @@ def check_photo(image: UploadFile):
         return Response(status_code=422)
 
     image_path = save_file(image, image.content_type)
-    task = create_task.delay(str(image_path))
+    task = predict_image.delay(str(image_path))
     return JSONResponse({"task_id": task.id})
 
 
@@ -45,6 +47,16 @@ def get_photo(task_id: str):
         "task_result": task_result.result,
     }
     return JSONResponse(result)
+
+
+# @app.get("/model_status")
+# def check_model_status():
+#     try:
+#         sample_image_path = "tests/assets/test.jpg"
+#         predict = get_prediction(str(sample_image_path), model)
+#         return {"model_status": "OK", "last_checked": datetime.now().isoformat(), "prediction": predict}
+#     except Exception as e:
+#         return {"model_status": "Error", "error_message": str(e), "last_checked": datetime.now().isoformat()}
 
 
 @app.get("/ping")

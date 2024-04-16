@@ -16,7 +16,7 @@ services:
 
   worker:
     build: .
-    command: celery -A app.worker.celery --workdir=. worker --loglevel=info
+    command: celery -A app.worker.celery --workdir=. worker --loglevel=info -P solo
     volumes:
       - .:/usr/src/app
     environment:
