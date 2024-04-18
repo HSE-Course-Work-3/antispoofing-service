@@ -1,8 +1,31 @@
+from typing import Optional
+
 import torch
+from albumentations import CenterCrop, Compose, Normalize, PadIfNeeded
 from albumentations.pytorch.transforms import ToTensorV2
 from datasouls_antispoof.class_mapping import class_mapping
+from iglovikov_helper_functions.dl.pytorch.utils import rename_layers
 from iglovikov_helper_functions.utils.image_utils import load_rgb
-from albumentations import Compose, PadIfNeeded, Normalize, CenterCrop
+from timm import create_model as timm_create_model
+from torch import nn
+
+from app.paths import EFFICENT_NET_PATH
+
+MODEL_WEIGHTS = {"tf_efficientnet_b3_ns": EFFICENT_NET_PATH}
+
+
+def create_model(model_name: str, activation: Optional[str] = "softmax"):
+    model = timm_create_model(model_name, pretrained=False, num_classes=4)
+
+    state_dict = torch.load(
+        MODEL_WEIGHTS[model_name], map_location=torch.device("cpu")
+    )["state_dict"]
+    state_dict = rename_layers(state_dict, {"model.": ""})
+    model.load_state_dict(state_dict)
+
+    if activation == "softmax":
+        return nn.Sequential(model, nn.Softmax(dim=1))
+    return model
 
 
 def get_prediction(image_path, model):

@@ -1,13 +1,11 @@
 from pathlib import Path
 from uuid import UUID
-from datetime import datetime
 
 from celery.result import AsyncResult
 from fastapi import FastAPI, Response, UploadFile
 from fastapi.responses import JSONResponse
 
-from app.worker import create_task, predict_image
-from app.neural_network import get_prediction
+from app.worker import predict_image
 
 app = FastAPI()
 
