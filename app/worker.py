@@ -1,5 +1,4 @@
 import os
-import importlib
 import logging
 from celery import Task
 

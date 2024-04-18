@@ -6,7 +6,7 @@ from celery.result import AsyncResult
 from fastapi import FastAPI, Response, UploadFile
 from fastapi.responses import JSONResponse
 
-from app.worker import create_task, predict_image
+from app.worker import model, predict_image
 from app.neural_network import get_prediction
 
 app = FastAPI()
@@ -49,14 +49,14 @@ def get_photo(task_id: str):
     return JSONResponse(result)
 
 
-# @app.get("/model_status")
-# def check_model_status():
-#     try:
-#         sample_image_path = "tests/assets/test.jpg"
-#         predict = get_prediction(str(sample_image_path), model)
-#         return {"model_status": "OK", "last_checked": datetime.now().isoformat(), "prediction": predict}
-#     except Exception as e:
-#         return {"model_status": "Error", "error_message": str(e), "last_checked": datetime.now().isoformat()}
+@app.get("/model_status")
+def check_model_status():
+    try:
+        sample_image_path = "tests/assets/test.jpg"
+        predict = get_prediction(str(sample_image_path), model)
+        return {"model_status": "OK", "last_checked": datetime.now().isoformat(), "prediction": predict}
+    except Exception as e:
+        return {"model_status": "Error", "error_message": str(e), "last_checked": datetime.now().isoformat()}
 
 
 @app.get("/ping")
