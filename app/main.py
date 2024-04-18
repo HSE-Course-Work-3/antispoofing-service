@@ -47,14 +47,22 @@ def get_photo(task_id: str):
     return JSONResponse(result)
 
 
-# @app.get("/model_status")
-# def check_model_status():
-#     try:
-#         sample_image_path = "tests/assets/test.jpg"
-#         predict = get_prediction(str(sample_image_path), model)
-#         return {"model_status": "OK", "last_checked": datetime.now().isoformat(), "prediction": predict}
-#     except Exception as e:
-#         return {"model_status": "Error", "error_message": str(e), "last_checked": datetime.now().isoformat()}
+@app.get("/model_status")
+def check_model_status():
+    try:
+        sample_image_path = "tests/assets/test.jpg"
+        predict = predict_image.delay(sample_image_path).get()
+        return {
+            "model_status": "OK",
+            "last_checked": datetime.now().isoformat(),
+            "prediction": predict,
+        }
+    except Exception as e:
+        return {
+            "model_status": "Error",
+            "error_message": str(e),
+            "last_checked": datetime.now().isoformat(),
+        }
 
 
 @app.get("/ping")
