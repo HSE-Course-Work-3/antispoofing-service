@@ -1,9 +1,10 @@
-from pathlib import Path
 from uuid import UUID
+from pathlib import Path
 
+from datetime import datetime
 from celery.result import AsyncResult
-from fastapi import FastAPI, Response, UploadFile
 from fastapi.responses import JSONResponse
+from fastapi import FastAPI, Response, UploadFile
 
 from app.worker import predict_image
 
