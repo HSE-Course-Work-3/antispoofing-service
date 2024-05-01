@@ -3,11 +3,11 @@ import logging
 import requests
 
 from bot.text import *
+from bot.setting import API_TOKEN
 from telegram import ReplyKeyboardMarkup, ReplyKeyboardRemove, Update
 from telegram.ext import ContextTypes, filters, Application, CommandHandler, MessageHandler, ConversationHandler
 
 URL = 'http://localhost:8004'
-API_TOKEN = '6735438031:AAH8-wZ7EdomMXPbOv-vEOIMflXBmcmdi4Y'
 
 CHOOSING, SEND_PHOTO, CHECK_TASK = range(3)
 ALLOWED_EXTENSIONS = ['.jpg', '.jpeg', '.png']
