@@ -3,19 +3,27 @@ from pathlib import Path
 
 from datetime import datetime
 from celery.result import AsyncResult
+from fastapi import FastAPI, Request, Response, UploadFile
 from fastapi.responses import JSONResponse
-from fastapi import FastAPI, Response, UploadFile
+from slowapi import Limiter, _rate_limit_exceeded_handler
+from slowapi.errors import RateLimitExceeded
+from slowapi.util import get_remote_address
 
 from app.worker import predict_image
 
 app = FastAPI()
+
+limiter = Limiter(key_func=get_remote_address)
+app.state.limiter = limiter
+app.add_exception_handler(RateLimitExceeded, _rate_limit_exceeded_handler)
 
 TEMP_FOLDER = Path("tmp")
 PHOTO_CONTENT_TYPES = ["image/png", "image/jpeg"]
 
 
 @app.post("/check_photo", status_code=201)
-def check_photo(image: UploadFile):
+@limiter.limit("5/minute")
+def check_photo(request: Request, image: UploadFile):
     if image.content_type not in PHOTO_CONTENT_TYPES or image.content_type is None:
         return Response(status_code=422)
 
@@ -38,7 +46,8 @@ def generate_name(content_type: str):
 
 
 @app.get("/check_photo/{task_id}")
-def get_photo(task_id: str):
+@limiter.limit("5/minute")
+def get_photo(request: Request, task_id: str):
     task_result = AsyncResult(task_id)
     result = {
         "task_id": task_id,

@@ -1,4 +1,5 @@
 from pathlib import Path
+import time
 
 TEST_FOLDER = Path("tests")
 ASSETS_FOLDER = TEST_FOLDER / "assets"
@@ -23,6 +24,7 @@ def test_pipeline(test_app):
     }
     assert response.status_code == 200
 
+    time.sleep(1)
     while content["task_status"] == "PENDING":
         response = test_app.get(f"/check_photo/{task_id}")
         content = response.json()
