@@ -2,10 +2,10 @@ from pathlib import Path
 from uuid import UUID
 
 from celery.result import AsyncResult
-from fastapi import FastAPI, Response, UploadFile, Request
+from fastapi import FastAPI, Request, Response, UploadFile
 from fastapi.responses import JSONResponse
-from slowapi.errors import RateLimitExceeded
 from slowapi import Limiter, _rate_limit_exceeded_handler
+from slowapi.errors import RateLimitExceeded
 from slowapi.util import get_remote_address
 
 from app.worker import predict_image
