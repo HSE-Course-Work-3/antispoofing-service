@@ -9,9 +9,12 @@ from iglovikov_helper_functions.utils.image_utils import load_rgb
 from timm import create_model as timm_create_model
 from torch import nn
 
-from app.paths import EFFICENT_NET_PATH
+from app.paths import EFFICENT_NET_PATH, RESNET_PATH
 
-MODEL_WEIGHTS = {"tf_efficientnet_b3_ns": EFFICENT_NET_PATH}
+MODEL_WEIGHTS = {
+    "tf_efficientnet_b3_ns": EFFICENT_NET_PATH,
+    "swsl_resnext50_32x4d": RESNET_PATH,
+}
 
 
 def create_model(model_name: str, activation: Optional[str] = "softmax"):

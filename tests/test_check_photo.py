@@ -1,5 +1,5 @@
-from pathlib import Path
 import time
+from pathlib import Path
 
 TEST_FOLDER = Path("tests")
 ASSETS_FOLDER = TEST_FOLDER / "assets"

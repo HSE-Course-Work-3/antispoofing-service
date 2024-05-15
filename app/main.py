@@ -1,15 +1,15 @@
-from uuid import UUID
-from pathlib import Path
-
 from datetime import datetime
+from pathlib import Path
+from uuid import UUID
+
 from celery.result import AsyncResult
-from fastapi import FastAPI, Request, Response, UploadFile
+from fastapi import Body, FastAPI, Request, Response, UploadFile
 from fastapi.responses import JSONResponse
 from slowapi import Limiter, _rate_limit_exceeded_handler
 from slowapi.errors import RateLimitExceeded
 from slowapi.util import get_remote_address
 
-from app.worker import predict_image
+from app.worker import predict_image, predict_image_for_bot
 
 app = FastAPI()
 
@@ -23,12 +23,36 @@ PHOTO_CONTENT_TYPES = ["image/png", "image/jpeg"]
 
 @app.post("/check_photo", status_code=201)
 @limiter.limit("5/minute")
-def check_photo(request: Request, image: UploadFile):
+def check_photo(
+    request: Request,
+    image: UploadFile,
+    selected_model: str = Body(default="efficient_net"),
+):
     if image.content_type not in PHOTO_CONTENT_TYPES or image.content_type is None:
         return Response(status_code=422)
 
     image_path = save_file(image, image.content_type)
     task = predict_image.delay(str(image_path))
+    return JSONResponse({"task_id": task.id})
+
+
+@app.post("/check_photo_bot", status_code=200)
+@limiter.limit("5/minute")
+def check_photo_for_bot(
+    request: Request,
+    image: UploadFile,
+    bot_token: str = Body(..., embed=True),
+    user_id: int = Body(..., embed=True),
+    reply_message: int = Body(..., embed=True),
+    selected_model: str = Body(default="efficient_net"),
+):
+    if image.content_type not in PHOTO_CONTENT_TYPES or image.content_type is None:
+        return Response(content="image has incorrect content type", status_code=422)
+
+    image_path = save_file(image, image.content_type)
+    task = predict_image_for_bot.delay(
+        bot_token, user_id, reply_message, str(image_path), selected_model
+    )
     return JSONResponse({"task_id": task.id})
 
 
